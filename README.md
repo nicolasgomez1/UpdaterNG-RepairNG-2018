@@ -10,3 +10,10 @@ CheckUpdates(
   (string)TempFolder, 
   (string)DestinationFolder, 
   (string)AppToRun);
+
+ForceUpdate(
+  (num)Version, 
+  (string)UpdaterAdress, 
+  (string)TempFolder, 
+  (string)DestinationFolder, 
+  (string)AppToRun);
