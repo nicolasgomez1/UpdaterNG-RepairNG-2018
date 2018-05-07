@@ -51,7 +51,13 @@ function FileMoveCallBack(Source, Destination, Copied, Total, FileCopied, FileTo
 	Paragraph.SetText("Paragraph1", String.GetFormattedSize(Copied, FMTSIZE_AUTOMATIC, true).."/"..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, true));
 end
 
-function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder)
+function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder, AppToRun)
+	for PID, FilePath in pairs(System.EnumerateProcesses()) do
+		if(String.Lower(String.SplitPath(FilePath).Filename..String.SplitPath(FilePath).Extension) == String.Lower(String.SplitPath(AppToRun).Filename..String.SplitPath(AppToRun).Extension))then
+			System.TerminateProcess(PID);
+			break;
+		end
+	end
 	XML.SetXML(SubmitCheckMethod(UpdaterAdress));
 	for Count = 1, XML.Count("UpdaterNG", "Update") do
 		local UpdateVersion = XML.GetAttribute("UpdaterNG/Update:"..Count.."", "version");
@@ -69,6 +75,7 @@ function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder)
 	if(Error == 0)then
 		Paragraph.SetText("Paragraph1", "Update Completed");
 		Folder.DeleteTree(TempFolder, nil);
+		File.Open(AppToRun, "", SW_SHOWNORMAL);
 	else
 		Paragraph.SetText("Paragraph1", _tblErrorMessages[Error]);
 	end
@@ -100,7 +107,6 @@ function MakeRepairFile(Hostname, Exceptions)
 	for _, Path in pairs(File.Find(_SourceFolder.."", "*", true, false, nil, nil)) do
 		local FileData = String.SplitPath(Path);
 		local Status = (false);
-		--for _, exception in pairs(DelimitedToTable(Exceptions, ",")) do
 		for _, exception in pairs(Exceptions) do
 			Dialog.Message("", exception);
 			if(FileData.Filename..FileData.Extension ~= exception)then
@@ -110,7 +116,6 @@ function MakeRepairFile(Hostname, Exceptions)
 				break;
 			end
 		end
-		--if(FileData.Filename..FileData.Extension ~= "autorun.exe" and FileData.Filename..FileData.Extension ~= "Test.xml" and FileData.Filename..FileData.Extension ~= "autorun.cdd")then
 		if(Status == false)then
 			XML.SetValue("RepairNG/file:"..Counter, FileData.Filename..FileData.Extension, false);
 			XML.SetAttribute("RepairNG/file:"..Counter, "checksum", Crypto.MD5DigestFromFile(Path));
@@ -122,7 +127,7 @@ function MakeRepairFile(Hostname, Exceptions)
 	XML.Save(_SourceFolder.."\\RepairNG.xml");
 end
 
-function Repair(RepairAdress, RepairFolderAdress, TempFolder, DestinationFolder)
+function Repair(RepairAdress, RepairFolderAdress, TempFolder, DestinationFolder, AppToRun)
 	local Status = (true);
 	XML.SetXML(SubmitCheckMethod(RepairFolderAdress));
 	for Count = 1, XML.Count("RepairNG", "*") do
@@ -141,9 +146,9 @@ function Repair(RepairAdress, RepairFolderAdress, TempFolder, DestinationFolder)
 	end
 	Error = Application.GetLastError();
 	if(Error == 0)then
-		Paragraph.SetText("Paragraph1", "Repair Completed");
-		Progress.SetCurrentPos("Progress1", 100);
+		Paragraph.SetText("Paragraph1", "Update Completed");
 		Folder.DeleteTree(TempFolder, nil);
+		File.Open(AppToRun, "", SW_SHOWNORMAL);
 	else
 		Paragraph.SetText("Paragraph1", _tblErrorMessages[Error]);
 	end
