@@ -28,4 +28,3 @@ Repair(
   (string)TempFolder,
   (string)DestinationFolder,
   (string)AppToRun);
-g
