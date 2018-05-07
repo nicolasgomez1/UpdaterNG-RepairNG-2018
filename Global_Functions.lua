@@ -126,9 +126,9 @@ function MakeRepairFile(Hostname, Exceptions)
 	XML.Save(_SourceFolder.."\\RepairNG.xml");
 end
 
-function Repair(RepairAdress, RepairFolderAdress, TempFolder, DestinationFolder, AppToRun)
+function Repair(RepairAdress, TempFolder, DestinationFolder, AppToRun)
 	local Status = (true);
-	XML.SetXML(SubmitCheckMethod(RepairFolderAdress));
+	XML.SetXML(SubmitCheckMethod(RepairAdress));
 	for Count = 1, XML.Count("RepairNG", "*") do
 		if(File.DoesExist(XML.GetAttribute("RepairNG/file:"..Count, "path")..XML.GetValue("RepairNG/file:"..Count)))then
 			if(XML.GetAttribute("RepairNG/file:"..Count, "checksum") ~= Crypto.MD5DigestFromFile(XML.GetAttribute("RepairNG/file:"..Count, "path")..XML.GetValue("RepairNG/file:"..Count)))then
@@ -139,7 +139,7 @@ function Repair(RepairAdress, RepairFolderAdress, TempFolder, DestinationFolder,
 		end
 		
 		if(Status == false)then
-			DownloadCheckMethod(RepairFolderAdress..XML.GetAttribute("RepairNG/file:"..Count, "url"), TempFolder.."\\"..XML.GetValue("RepairNG/file:"..Count));
+			DownloadCheckMethod(XML.GetAttribute("RepairNG/file:"..Count, "url"), TempFolder.."\\"..XML.GetValue("RepairNG/file:"..Count));
 			File.Move(TempFolder.."\\*.*", DestinationFolder.."\\", true, true, true, true, FileMoveCallBack);
 		end
 	end
