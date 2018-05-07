@@ -27,5 +27,5 @@ Repair(
   (string)RepairFolderAdress,
   (string)TempFolder,
   (string)DestinationFolder,
-  (string)AppToRun)
+  (string)AppToRun);
 g
