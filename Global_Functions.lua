@@ -65,8 +65,8 @@ function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder, AppT
 			if(tonumber(Version) ~= tonumber(UpdateVersion))then
 				local UpdateUrl = XML.GetValue("UpdaterNG/Update:"..Count.."");
 				local FileData = String.SplitPath(UpdateUrl);
-				DownloadCheckMethod(UpdateUrl, TempFolder.."\\"..FileData.Filename..String.TrimRight(FileData.Extension, "?dl=1"));
-				Zip.Extract(TempFolder.."\\"..FileData.Filename..String.TrimRight(FileData.Extension, "?dl=1"), {"*.*"}, TempFolder.."\\unzip\\", true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallBack);
+				DownloadCheckMethod(UpdateUrl, TempFolder.."\\"..FileData.Filename..FileData.Extension);
+				Zip.Extract(TempFolder.."\\"..FileData.Filename..FileData.Extension, {"*.*"}, TempFolder.."\\unzip\\", true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallBack);
 				File.Move(TempFolder.."\\unzip\\*.*", DestinationFolder.."\\", true, true, true, true, FileMoveCallBack);
 			end
 		end
@@ -81,7 +81,7 @@ function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder, AppT
 	end
 end
 
-function CheckUpdates(Version, UpdaterAdress, TempFolder, DestinationFolder)
+function CheckUpdates(Version, UpdaterAdress, TempFolder, DestinationFolder, AppToRun)
 	XML.SetXML(SubmitCheckMethod(UpdaterAdress));
 	for Count = 1, XML.Count("UpdaterNG", "Update") do
 		local UpdateVersion = XML.GetAttribute("UpdaterNG/Update:"..Count.."", "version");
@@ -95,7 +95,7 @@ function CheckUpdates(Version, UpdaterAdress, TempFolder, DestinationFolder)
 		end
 	end
 	if(Status == true)then
-		ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder);
+		ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder, AppToRun);
 	else
 		Paragraph.SetText("Paragraph1", "Aplication Updated");
 	end
@@ -108,7 +108,6 @@ function MakeRepairFile(Hostname, Exceptions)
 		local FileData = String.SplitPath(Path);
 		local Status = (false);
 		for _, exception in pairs(Exceptions) do
-			Dialog.Message("", exception);
 			if(FileData.Filename..FileData.Extension ~= exception)then
 				Status = (false);
 			else
