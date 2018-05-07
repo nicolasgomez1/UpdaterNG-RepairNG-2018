@@ -24,7 +24,6 @@ MakeRepairFile(
 	
 Repair(
   (string)RepairAdress,
-  (string)RepairFolderAdress,
   (string)TempFolder,
   (string)DestinationFolder,
   (string)AppToRun);
