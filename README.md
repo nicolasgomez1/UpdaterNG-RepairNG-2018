@@ -17,3 +17,14 @@ ForceUpdate(
   (string)TempFolder, 
   (string)DestinationFolder, 
   (string)AppToRun);
+
+MakeRepairFile(
+	(string)Hostname, 
+	(table)Exceptions);
+	
+Repair(
+	(string)RepairAdress,
+	(string)RepairFolderAdress,
+	(string)TempFolder,
+	(string)DestinationFolder,
+	(string)AppToRun)
