@@ -19,12 +19,12 @@ ForceUpdate(
   (string)AppToRun);
 
 MakeRepairFile(
-	(string)Hostname, 
-	(table)Exceptions);
+  (string)Hostname, 
+  (table)Exceptions);
 	
 Repair(
-	(string)RepairAdress,
-	(string)RepairFolderAdress,
-	(string)TempFolder,
-	(string)DestinationFolder,
-	(string)AppToRun)
+  (string)RepairAdress,
+  (string)RepairFolderAdress,
+  (string)TempFolder,
+  (string)DestinationFolder,
+  (string)AppToRun)
