@@ -48,7 +48,7 @@ function ZipCallBack(File, Percent, Status)
 end
 
 function FileMoveCallBack(Source, Destination, Copied, Total, FileCopied, FileTotal)
-	Paragraph.SetText("Paragraph1", Copied.."/"..Total);
+	Paragraph.SetText("Paragraph1", String.GetFormattedSize(Copied, FMTSIZE_AUTOMATIC, true).."/"..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, true));
 end
 
 function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder)
@@ -94,12 +94,24 @@ function CheckUpdates(Version, UpdaterAdress, TempFolder, DestinationFolder)
 	end
 end
 
-function MakeRepairFile(Hostname)
+function MakeRepairFile(Hostname, Exceptions)
 	XML.SetXML("<RepairNG></RepairNG>");
-	Counter = (1);
+	local Counter = (1);
 	for _, Path in pairs(File.Find(_SourceFolder.."", "*", true, false, nil, nil)) do
 		local FileData = String.SplitPath(Path);
-		if(FileData.Filename..FileData.Extension ~= "autorun.exe" and FileData.Filename..FileData.Extension ~= "Test.xml" and FileData.Filename..FileData.Extension ~= "autorun.cdd")then
+		local Status = (false);
+		--for _, exception in pairs(DelimitedToTable(Exceptions, ",")) do
+		for _, exception in pairs(Exceptions) do
+			Dialog.Message("", exception);
+			if(FileData.Filename..FileData.Extension ~= exception)then
+				Status = (false);
+			else
+				Status = (true);
+				break;
+			end
+		end
+		--if(FileData.Filename..FileData.Extension ~= "autorun.exe" and FileData.Filename..FileData.Extension ~= "Test.xml" and FileData.Filename..FileData.Extension ~= "autorun.cdd")then
+		if(Status == false)then
 			XML.SetValue("RepairNG/file:"..Counter, FileData.Filename..FileData.Extension, false);
 			XML.SetAttribute("RepairNG/file:"..Counter, "checksum", Crypto.MD5DigestFromFile(Path));
 			XML.SetAttribute("RepairNG/file:"..Counter, "path", String.Replace(String.MakePath({Folder=FileData.Drive..FileData.Folder}), Folder.GetCurrent().."\\", "", false));
@@ -110,9 +122,9 @@ function MakeRepairFile(Hostname)
 	XML.Save(_SourceFolder.."\\RepairNG.xml");
 end
 
-function Repair(RepairAdress, RepairAdressFolder, TempFolder, DestinationFolder)
+function Repair(RepairAdress, RepairFolderAdress, TempFolder, DestinationFolder)
 	local Status = (true);
-	XML.SetXML(SubmitCheckMethod(RepairAdress));
+	XML.SetXML(SubmitCheckMethod(RepairFolderAdress));
 	for Count = 1, XML.Count("RepairNG", "*") do
 		if(File.DoesExist(XML.GetAttribute("RepairNG/file:"..Count, "path")..XML.GetValue("RepairNG/file:"..Count)))then
 			if(XML.GetAttribute("RepairNG/file:"..Count, "checksum") ~= Crypto.MD5DigestFromFile(XML.GetAttribute("RepairNG/file:"..Count, "path")..XML.GetValue("RepairNG/file:"..Count)))then
@@ -123,7 +135,7 @@ function Repair(RepairAdress, RepairAdressFolder, TempFolder, DestinationFolder)
 		end
 		
 		if(Status == false)then
-			DownloadCheckMethod(RepairAdressFolder..XML.GetAttribute("RepairNG/file:"..Count, "url"), TempFolder.."\\"..XML.GetValue("RepairNG/file:"..Count));
+			DownloadCheckMethod(RepairFolderAdress..XML.GetAttribute("RepairNG/file:"..Count, "url"), TempFolder.."\\"..XML.GetValue("RepairNG/file:"..Count));
 			File.Move(TempFolder.."\\*.*", DestinationFolder.."\\", true, true, true, true, FileMoveCallBack);
 		end
 	end
