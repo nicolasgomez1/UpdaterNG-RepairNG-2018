@@ -166,7 +166,7 @@ function UpdateTheUpdater(Version, UpdaterAdress, TempFolder, AppToRun)
 				timeout /t 5
 				move "]]..''..TempFolder..''..[[\NewUpdate\*"]]..' "'.._SourceFolder..'"\r\n'..[[
 				start]]..' "" "'..AppToRun..'"\r\n'..[[
-				del ]]..'"'..TempFolder..'\\*" /q /y\r\n'..[[
+				DEL ]]..'"'..TempFolder..'\\*" /s /q\r\n'..[[
 				del "%~f0"
 			]], false);
 			Dialog.Message("UpdaterNG", "The application is updated in the background, this may take a few minutes...", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1)
