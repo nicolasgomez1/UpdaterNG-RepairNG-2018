@@ -27,3 +27,9 @@ Repair(
   (string)TempFolder,
   (string)DestinationFolder,
   (string)AppToRun);
+
+UpdateTheUpdater(
+  (num)Version,
+  (string)UpdaterAdress,
+  (string)TempFolder, 
+  (string)AppToRun);
