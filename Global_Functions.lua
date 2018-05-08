@@ -161,14 +161,14 @@ function UpdateTheUpdater(Version, UpdaterAdress, TempFolder, AppToRun)
 			DownloadCheckMethod(XML.GetValue("UpdaterNG/Updater"), TempFolder.."\\Update.zip");
 			Zip.Extract(TempFolder.."\\Update.zip", {"*.*"}, TempFolder.."\\NewUpdate\\", true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallBack);
 			TextFile.WriteFromString(_TempFolder..'\\MoveUpdate.bat', [[
-            	@ECHO OFF
-            	title UpdaterNG
-	            timeout /t 5
-	            move "]]..''..TempFolder..''..[[\NewUpdate\*"]]..' "'.._SourceFolder..'"\r\n'..[[
-	            start]]..' "" "'..AppToRun..'"\r\n'..[[
-	            del ]]..'"'..TempFolder..'\\*" /q /y\r\n'..[[
-	            del "%~f0"
-	        ]], false);
+				@ECHO OFF
+				title UpdaterNG
+				timeout /t 5
+				move "]]..''..TempFolder..''..[[\NewUpdate\*"]]..' "'.._SourceFolder..'"\r\n'..[[
+				start]]..' "" "'..AppToRun..'"\r\n'..[[
+				del ]]..'"'..TempFolder..'\\*" /q /y\r\n'..[[
+				del "%~f0"
+			]], false);
 			Dialog.Message("UpdaterNG", "The application is updated in the background, this may take a few minutes...", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1)
 			File.Run(_TempFolder..'\\MoveUpdate.bat', '', '', SW_HIDE, false);
 			Application.Exit(0);
