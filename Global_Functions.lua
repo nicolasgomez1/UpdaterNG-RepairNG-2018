@@ -48,7 +48,7 @@ function ZipCallBack(File, Percent, Status)
 end
 
 function FileMoveCallBack(Source, Destination, Copied, Total, FileCopied, FileTotal)
-	Paragraph.SetText("Paragraph1", String.GetFormattedSize(Copied, FMTSIZE_AUTOMATIC, true).."/"..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, true));
+	Paragraph.SetText("Paragraph1", "Applied"..String.GetFormattedSize(Copied, FMTSIZE_AUTOMATIC, true).." Of "..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, true));
 end
 
 function ForceUpdate(Version, UpdaterAdress, TempFolder, DestinationFolder, AppToRun)
@@ -150,5 +150,28 @@ function Repair(RepairAdress, TempFolder, DestinationFolder, AppToRun)
 		File.Open(AppToRun, "", SW_SHOWNORMAL);
 	else
 		Paragraph.SetText("Paragraph1", _tblErrorMessages[Error]);
+	end
+end
+
+function UpdateTheUpdater(Version, UpdaterAdress, TempFolder, AppToRun)
+	XML.SetXML(SubmitCheckMethod(UpdaterAdress));
+	if(tonumber(Version) < tonumber(XML.GetAttribute("UpdaterNG/Updater", "version")))then
+		if(tonumber(Version) ~= tonumber(XML.GetAttribute("UpdaterNG/Updater", "Version")))then
+			local URL = XML.GetValue("UpdaterNG/Updater");
+			DownloadCheckMethod(XML.GetValue("UpdaterNG/Updater"), TempFolder.."\\Update.zip");
+			Zip.Extract(TempFolder.."\\Update.zip", {"*.*"}, TempFolder.."\\NewUpdate\\", true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallBack);
+			TextFile.WriteFromString(_TempFolder..'\\MoveUpdate.bat', [[
+            	@ECHO OFF
+            	title UpdaterNG
+	            timeout /t 5
+	            move "]]..''..TempFolder..''..[[\NewUpdate\*"]]..' "'.._SourceFolder..'"\r\n'..[[
+	            start]]..' "" "'..AppToRun..'"\r\n'..[[
+	            del ]]..'"'..TempFolder..'\\*" /q /y\r\n'..[[
+	            del "%~f0"
+	        ]], false);
+			Dialog.Message("UpdaterNG", "The application is updated in the background, this may take a few minutes...", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1)
+			File.Run(_TempFolder..'\\MoveUpdate.bat', '', '', SW_HIDE, false);
+			Application.Exit(0);
+		end
 	end
 end
