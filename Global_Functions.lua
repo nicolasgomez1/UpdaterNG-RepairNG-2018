@@ -102,9 +102,13 @@ function CheckUpdates(Version, UpdaterAdress, TempFolder, DestinationFolder, App
 end
 
 function MakeRepairFile(Hostname, Exceptions)
+	local Start = (os.clock());
 	XML.SetXML("<RepairNG></RepairNG>");
 	local Counter = (1);
-	for _, Path in pairs(File.Find(_SourceFolder.."", "*", true, false, nil, nil)) do
+	StatusDlg.Show(MB_ICONNONE, false);
+	StatusDlg.ShowProgressMeter(false);
+	for _, Path in pairs(File.Find(Dialog.FolderBrowse("Select a folder to scan:", _DesktopFolder), "*", true, false, nil, nil)) do
+	--for _, Path in pairs(File.Find(_SourceFolder.."", "*", true, false, nil, nil)) do
 		local FileData = String.SplitPath(Path);
 		local Status = (false);
 		for _, exception in pairs(Exceptions) do
@@ -124,6 +128,11 @@ function MakeRepairFile(Hostname, Exceptions)
 		end
 	end
 	XML.Save(_SourceFolder.."\\RepairNG.xml");
+	StatusDlg.SetTitle("Ready");
+	StatusDlg.SetMessage("Elapsed time:");
+	StatusDlg.SetStatusText(string.format("%.2f\n", os.clock() - Start));
+	Application.Sleep(2500);
+	StatusDlg.Hide();
 end
 
 function Repair(RepairAdress, TempFolder, DestinationFolder, AppToRun)
